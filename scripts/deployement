@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# Vérification que le fichier CSV est fourni en argument
+if [ $# -ne 1 ]; then
+    echo "Utilisation : $0 fichier.csv"
+    exit 1
+fi
+
+csv_file="$1"
+
+# Vérification de si le fichier existe
+if [ ! -f "$csv_file" ]; then
+    echo "Le fichier $csv_file n'existe pas."
+    exit 1
+fi
+
+# Lecture du fichier CSV et attribution des valeurs aux variables
+while IFS=',' read -r var value; do
+    case "$var" in
+        *)
+            if [ -n "$var" ]; then
+                eval "$var=\"$value\""
+            fi
+            ;;
+    esac
+done < "$csv_file"
+
+# Affichage des valeurs des variables
+echo "web = $web"
+echo "bdd = $bdd"
