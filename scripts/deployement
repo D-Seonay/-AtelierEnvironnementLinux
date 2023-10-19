@@ -1,4 +1,3 @@
-```sh
 #!/bin/bash
 
 # Vérification que le fichier CSV est fourni en argument
@@ -93,4 +92,3 @@ FLUSH PRIVILEGES;
 MYSQL_SCRIPT
 
 echo "Le mot de passe root de MySQL a été modifié. Nouveau mot de passe : $PASSWORD"
-```
