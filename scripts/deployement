@@ -31,9 +31,10 @@ echo "bdd = $bdd"
 
 
 #connexion à la vm web
-ssh root@$web <<'eof'
+$SUDOPASS = "root"
+echo $SUDOPASS | ssh root@$web <<'eof'
 
-echo "root"
+
 
 # Vérifie les mises à jour du système
 sudo apt update && sudo apt -y upgrade
