@@ -30,47 +30,58 @@ done < "$csv_file"
 echo "web = $web"
 echo "bdd = $bdd"
 
+function command_ssh {
+  [ ${#} -gt 0 ] || return 1
+  echo $SUDOPASS | ssh -tt kidoly@$web ${@}
+}
+
 #connexion à la vm web
 SUDOPASS="root"
 echo $SUDOPASS
 echo $web
 
-sshpass -v -p $SUDOPASS ssh kidoly@$web <<EOF
+sshpass -v -p $SUDOPASS ssh kidoly@$web
 
 # Vérifie les mises à jour du système
-echo "$SUDOPASS" | sudo apt update && sudo apt -y upgrade
+command_ssh sudo apt update && sudo apt -y upgrade
 
 # Installe PHP et ses extensions
-echo "$SUDOPASS" | sudo apt -y install php php-common php-cli php-fpm php-json php-pdo php-mysql php-zip php-gd php-mbstring php-curl php-xml php-pear php-bcmath
+command_ssh sudo apt -y install php php-common php-cli php-fpm php-json php-pdo php-mysql php-zip php-gd php-mbstring php-curl php-xml php-pear php-bcmath
 
 # Installe Apache
-echo "$SUDOPASS" | sudo apt install apache2 -y
+command_ssh sudo apt install apache2 -y
 
 # Donne les droits à l'utilisateur sur le dossier Apache
-echo "$SUDOPASS" | sudo chown -R $USER:www-data /var/www/html/
-echo "$SUDOPASS" | sudo chmod -R 770 /var/www/html/
+command_ssh sudo chown -R $USER:www-data /var/www/html/
+command_ssh sudo chmod -R 770 /var/www/html/
 
-echo "$SUDOPASS" | echo "Le script a terminé avec succès. Votre serveur web est prêt."
+command_ssh echo "Le script a terminé avec succès. Votre serveur web est prêt."
 
 exit
-EOF
+
+function command_ssh {
+  [ ${#} -gt 0 ] || return 1
+  echo $SUDOPASS | ssh -tt kidoly@$bdd ${@}
+}
+
+
 #connexion à la vm bdd
 SUDOPASS="root"
-sshpass -v -p$SUDOPASS ssh -tt kidoly@$bdd  <<EOF
+sshpass -v -p$SUDOPASS ssh -tt kidoly@$bdd 
 
-echo "$SUDOPASS" | touch /home/kidoly/itworks8
+command_ssh touch /home/kidoly/itworks8
 
 # Vérifie les mises à jour du système
-echo "$SUDOPASS" | sudo apt update && sudo apt -y upgrade
+command_ssh sudo apt update && sudo apt -y upgrade
 
 # Installation d'OpenSSL
-echo "$SUDOPASS" | sudo apt install openssl -y
+command_ssh sudo apt install openssl -y
 
 # Installation de MariaDB
-echo "$SUDOPASS" | sudo apt install mariadb-server php-mysql -y
+command_ssh sudo apt install mariadb-server php-mysql -y
 
 # On se connecte à MySQL
-echo "$SUDOPASS" | sudo mysql --user=root <<MYSQL_SCRIPT
+command_ssh sudo mysql --user=root <<MYSQL_SCRIPT
 $PASSWORD = "$(openssl rand -base64 32)"
 # On change le mot de passe de l'utilisateur root
 ALTER USER 'root'@'localhost' IDENTIFIED BY '$PASSWORD';
@@ -79,4 +90,4 @@ MYSQL_SCRIPT
 
 echo "Le mot de passe root de MySQL a été modifié. Nouveau mot de passe : $PASSWORD"
 exit
-EOF
+
