@@ -1,4 +1,5 @@
 #!/bin/bash
+apt install sshpass -y
 
 # Vérification que le fichier CSV est fourni en argument
 if [ $# -ne 1 ]; then
@@ -32,7 +33,7 @@ echo "bdd = $bdd"
 
 #connexion à la vm web
 $SUDOPASS = "root"
-echo $SUDOPASS | ssh root@$web <<'eof'
+echo $SUDOPASS | ssh root@$web 
 
 
 
