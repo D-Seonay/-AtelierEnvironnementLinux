@@ -31,8 +31,10 @@ echo "web = $web"
 echo "bdd = $bdd"
 
 #connexion à la vm web
-$SUDOPASS = "root"
-echo $SUDOPASS | ssh root@$web 
+SUDOPASS="root"
+sshpass -p $SUDOPASS ssh kidoly@$web
+
+apt-get install sudo
 
 # Vérifie les mises à jour du système
 sudo apt update && sudo apt -y upgrade
@@ -63,10 +65,23 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-echo "Le script a terminé avec succès. Votre serveur est prêt."
+echo "Le script a terminé avec succès. Votre serveur web est prêt."
 
-#connexion au serveur distant
-ssh user@$bdd <<'eof'
+exit
+
+
+#connexion à la vm web
+SUDOPASS="root"
+sshpass -p $SUDOPASS ssh kidoly@$bdd
+
+apt-get install sudo
+
+# Vérifie les mises à jour du système
+sudo apt update && sudo apt -y upgrade
+if [ $? -ne 0 ]; then
+    echo "Échec de la mise à jour du système. Veuillez vérifier les erreurs."
+    exit 1
+fi
 
 # Installation d'OpenSSL
 sudo apt install openssl -y
