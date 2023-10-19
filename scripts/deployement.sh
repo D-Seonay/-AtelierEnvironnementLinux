@@ -32,73 +32,47 @@ echo "bdd = $bdd"
 
 #connexion à la vm web
 SUDOPASS="root"
-sshpass -p $SUDOPASS ssh kidoly@$web
+echo $SUDOPASS
+echo $web
 
-apt-get install sudo
+sshpass -v -p $SUDOPASS ssh kidoly@$web <<EOF
+echo $SUDOPASS | apt-get install sudo
 
 # Vérifie les mises à jour du système
-sudo apt update && sudo apt -y upgrade
-if [ $? -ne 0 ]; then
-    echo "Échec de la mise à jour du système. Veuillez vérifier les erreurs."
-    exit 1
-fi
+echo "$SUDOPASS" | sudo apt update && sudo apt -y upgrade
 
 # Installe PHP et ses extensions
-sudo apt -y install php php-common php-cli php-fpm php-json php-pdo php-mysql php-zip php-gd php-mbstring php-curl php-xml php-pear php-bcmath
-if [ $? -ne 0 ]; then
-    echo "Échec de l'installation de PHP et de ses extensions. Veuillez vérifier les erreurs."
-    exit 1
-fi
+echo "$SUDOPASS" | sudo apt -y install php php-common php-cli php-fpm php-json php-pdo php-mysql php-zip php-gd php-mbstring php-curl php-xml php-pear php-bcmath
 
 # Installe Apache
-sudo apt install apache2
-if [ $? -ne 0 ]; then
-    echo "Échec de l'installation d'Apache. Veuillez vérifier les erreurs."
-    exit 1
-fi
+echo "$SUDOPASS" | sudo apt install apache2 -y
 
 # Donne les droits à l'utilisateur sur le dossier Apache
-sudo chown -R $USER:www-data /var/www/html/
-sudo chmod -R 770 /var/www/html/
-if [ $? -ne 0 ]; then
-    echo "Échec de la configuration des permissions sur le dossier web. Veuillez vérifier les erreurs."
-    exit 1
-fi
+echo "$SUDOPASS" | sudo chown -R $USER:www-data /var/www/html/
+echo "$SUDOPASS" | sudo chmod -R 770 /var/www/html/
 
-echo "Le script a terminé avec succès. Votre serveur web est prêt."
+echo "$SUDOPASS" | echo "Le script a terminé avec succès. Votre serveur web est prêt."
 
 exit
-
-
-#connexion à la vm web
+EOF
+#connexion à la vm bdd
 SUDOPASS="root"
-sshpass -p $SUDOPASS ssh kidoly@$bdd
+sshpass -v -p$SUDOPASS ssh -tt kidoly@$bdd  <<EOF
 
-apt-get install sudo
+echo "$SUDOPASS" | apt-get install sudo
+echo "$SUDOPASS" | touch /home/kidoly/itworks8
 
 # Vérifie les mises à jour du système
-sudo apt update && sudo apt -y upgrade
-if [ $? -ne 0 ]; then
-    echo "Échec de la mise à jour du système. Veuillez vérifier les erreurs."
-    exit 1
-fi
+echo "$SUDOPASS" | sudo apt update && sudo apt -y upgrade
 
 # Installation d'OpenSSL
-sudo apt install openssl -y
-if [ $? -ne 0 ]; then
-    echo "Échec de l'installation d'OpenSSL. Veuillez vérifier les erreurs."
-    exit 1
-fi
+echo "$SUDOPASS" | sudo apt install openssl -y
 
 # Installation de MariaDB
-sudo apt install mariadb-server php-mysql -y
-if [ $? -ne 0 ]; then
-    echo "Échec de l'installation de MariaDB. Veuillez vérifier les erreurs."
-    exit 1
-fi
+echo "$SUDOPASS" | sudo apt install mariadb-server php-mysql -y
 
 # On se connecte à MySQL
-sudo mysql --user=root <<MYSQL_SCRIPT
+echo "$SUDOPASS" | sudo mysql --user=root <<MYSQL_SCRIPT
 $PASSWORD = "$(openssl rand -base64 32)"
 # On change le mot de passe de l'utilisateur root
 ALTER USER 'root'@'localhost' IDENTIFIED BY '$PASSWORD';
@@ -106,3 +80,4 @@ FLUSH PRIVILEGES;
 MYSQL_SCRIPT
 
 echo "Le mot de passe root de MySQL a été modifié. Nouveau mot de passe : $PASSWORD"
+EOF
