@@ -36,7 +36,6 @@ echo $SUDOPASS
 echo $web
 
 sshpass -v -p $SUDOPASS ssh kidoly@$web <<EOF
-echo $SUDOPASS | apt-get install sudo
 
 # Vérifie les mises à jour du système
 echo "$SUDOPASS" | sudo apt update && sudo apt -y upgrade
@@ -59,7 +58,6 @@ EOF
 SUDOPASS="root"
 sshpass -v -p$SUDOPASS ssh -tt kidoly@$bdd  <<EOF
 
-echo "$SUDOPASS" | apt-get install sudo
 echo "$SUDOPASS" | touch /home/kidoly/itworks8
 
 # Vérifie les mises à jour du système
@@ -80,4 +78,5 @@ FLUSH PRIVILEGES;
 MYSQL_SCRIPT
 
 echo "Le mot de passe root de MySQL a été modifié. Nouveau mot de passe : $PASSWORD"
+exit
 EOF
