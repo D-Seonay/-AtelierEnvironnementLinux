@@ -1,4 +1,5 @@
 #!/bin/bash
+apt install sshpass -y
 
 # Vérification que le fichier CSV est fourni en argument
 if [ $# -ne 1 ]; then
@@ -29,12 +30,11 @@ done < "$csv_file"
 echo "web = $web"
 echo "bdd = $bdd"
 
-
 #connexion à la vm web
-$SUDOPASS = "root"
-echo $SUDOPASS | ssh root@$web <<'eof'
+SUDOPASS="root"
+sshpass -p $SUDOPASS ssh kidoly@$web
 
-
+apt-get install sudo
 
 # Vérifie les mises à jour du système
 sudo apt update && sudo apt -y upgrade
@@ -65,10 +65,23 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-echo "Le script a terminé avec succès. Votre serveur est prêt."
+echo "Le script a terminé avec succès. Votre serveur web est prêt."
 
-#connexion au serveur distant
-ssh user@$web <<'eof'
+exit
+
+
+#connexion à la vm web
+SUDOPASS="root"
+sshpass -p $SUDOPASS ssh kidoly@$bdd
+
+apt-get install sudo
+
+# Vérifie les mises à jour du système
+sudo apt update && sudo apt -y upgrade
+if [ $? -ne 0 ]; then
+    echo "Échec de la mise à jour du système. Veuillez vérifier les erreurs."
+    exit 1
+fi
 
 # Installation d'OpenSSL
 sudo apt install openssl -y
