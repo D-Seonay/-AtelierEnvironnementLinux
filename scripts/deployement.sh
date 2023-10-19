@@ -30,12 +30,9 @@ done < "$csv_file"
 echo "web = $web"
 echo "bdd = $bdd"
 
-
 #connexion à la vm web
 $SUDOPASS = "root"
 echo $SUDOPASS | ssh root@$web 
-
-
 
 # Vérifie les mises à jour du système
 sudo apt update && sudo apt -y upgrade
@@ -69,7 +66,7 @@ fi
 echo "Le script a terminé avec succès. Votre serveur est prêt."
 
 #connexion au serveur distant
-ssh user@$web <<'eof'
+ssh user@$bdd <<'eof'
 
 # Installation d'OpenSSL
 sudo apt install openssl -y
