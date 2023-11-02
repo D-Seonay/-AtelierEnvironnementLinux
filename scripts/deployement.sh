@@ -1,4 +1,5 @@
 #!/bin/bash
+
 apt install sshpass -y
 
 # Vérification que le fichier CSV est fourni en argument
@@ -30,63 +31,51 @@ done < "$csv_file"
 echo "web = $web"
 echo "bdd = $bdd"
 
+# Fonction pour exécuter des commandes SSH avec sshpass
 function command_ssh {
-  [ ${#} -gt 0 ] || return 1
-  echo $SUDOPASS | sshpass -p $SUDOPASS -tt ssh kidoly@$web ${@}
+    [ ${#} -gt 0 ] || return 1
+    sshpass -p root ssh -o StrictHostKeyChecking=no kidoly@$1 $2
 }
 
-#connexion à la vm web
-SUDOPASS="root"
-echo $SUDOPASS
-echo $web
+# Connexion à la VM web
+SUDOPASS="root"  # Remplacez par le mot de passe SSH de votre hôte distant
 
+# Exemple : exécution de commandes SSH
+command_ssh "$web" "echo $SUDOPASS | sudo -S apt update && sudo apt -y upgrade"
+command_ssh "$web" "echo $SUDOPASS | sudo -S apt -y install php php-common php-cli php-fpm php-json php-pdo php-mysql php-zip php-gd php-mbstring php-curl php-xml php-pear php-bcmath"
+command_ssh "$web" "echo $SUDOPASS | sudo -S apt install apache2 -y"
+command_ssh "$web" "echo $SUDOPASS | sudo -S chown -R $USER:www-data /var/www/html/"
+command_ssh "$web" "echo $SUDOPASS | sudo -S chmod -R 770 /var/www/html/"
 
-# Vérifie les mises à jour du système
-command_ssh sudo apt update && sudo apt -y upgrade
+# Exemple : créer un répertoire sur l'hôte distant
+command_ssh "$web" "echo $SUDOPASS | sudo -S mkdir /home/kidoly/test405"
 
-# Installe PHP et ses extensions
-command_ssh sudo apt -y install php php-common php-cli php-fpm php-json php-pdo php-mysql php-zip php-gd php-mbstring php-curl php-xml php-pear php-bcmath
-
-# Installe Apache
-command_ssh sudo apt install apache2 -y
-
-# Donne les droits à l'utilisateur sur le dossier Apache
-command_ssh sudo chown -R $USER:www-data /var/www/html/
-command_ssh sudo chmod -R 770 /var/www/html/
-
-command_ssh echo "Le script a terminé avec succès. Votre serveur web est prêt."
-
+# Exemple : afficher un message
+command_ssh "$web" "echo 'Le script a terminé avec succès. Votre serveur est prêt.'"
 exit
-
-function command_ssh {
-  [ ${#} -gt 0 ] || return 1
-  echo $SUDOPASS | ssh -tt kidoly@$bdd ${@}
-}
-
 
 #connexion à la vm bdd
 SUDOPASS="root"
-sshpass -v -p$SUDOPASS ssh -tt kidoly@$bdd 
 
-command_ssh touch /home/kidoly/itworks8
+command_ssh "$web" "echo $SUDOPASS | touch /home/kidoly/itworks8"
 
 # Vérifie les mises à jour du système
-command_ssh sudo apt update && sudo apt -y upgrade
+command_ssh "$web" "echo $SUDOPASS |sudo -S apt update && sudo apt -y upgrade"
 
 # Installation d'OpenSSL
-command_ssh sudo apt install openssl -y
+command_ssh "$web" "echo $SUDOPASS |sudo -S apt install openssl -y"
 
 # Installation de MariaDB
-command_ssh sudo apt install mariadb-server php-mysql -y
+command_ssh "$web" "echo $SUDOPASS |sudo -S apt install mariadb-server php-mysql -y"
 
 # On se connecte à MySQL
-command_ssh sudo mysql --user=root <<MYSQL_SCRIPT
-$PASSWORD = "$(openssl rand -base64 32)"
+command_ssh "$web" "echo $SUDOPASS | sudo -S mysql --user=root <<MYSQL_SCRIPT
+$PASSWORD=\$(openssl rand -base64 32)
 # On change le mot de passe de l'utilisateur root
-ALTER USER 'root'@'localhost' IDENTIFIED BY '$PASSWORD';
+ALTER USER 'root'@'localhost' IDENTIFIED BY '\$PASSWORD';
 FLUSH PRIVILEGES;
-MYSQL_SCRIPT
+MYSQL_SCRIPT"
 
-echo "Le mot de passe root de MySQL a été modifié. Nouveau mot de passe : $PASSWORD"
+command_ssh "$web" "echo $SUDOPASS | echo "Le mot de passe root de MySQL a été modifié. Nouveau mot de passe : $PASSWORD"
 exit
 
