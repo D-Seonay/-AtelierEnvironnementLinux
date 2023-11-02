@@ -52,7 +52,6 @@ command_ssh "$web" "echo $SUDOPASS | sudo -S mkdir /home/kidoly/test405"
 
 # Exemple : afficher un message
 command_ssh "$web" "echo 'Le script a terminé avec succès. Votre serveur est prêt.'"
-exit
 
 #connexion à la vm bdd
 SUDOPASS="root"
