@@ -41,11 +41,40 @@ function command_ssh {
 SUDOPASS="root"  # Remplacez par le mot de passe SSH de votre hôte distant
 
 # Exemple : exécution de commandes SSH
-command_ssh "$web" "echo $SUDOPASS | sudo -S apt update && sudo apt -y upgrade"
-command_ssh "$web" "echo $SUDOPASS | sudo -S apt -y install php php-common php-cli php-fpm php-json php-pdo php-mysql php-zip php-gd php-mbstring php-curl php-xml php-pear php-bcmath"
-command_ssh "$web" "echo $SUDOPASS | sudo -S apt install apache2 -y"
+command_ssh "$web" "echo $SUDOPASS | sudo -S apt-get update && sudo apt -y upgrade"
+command_ssh "$web" "echo $SUDOPASS | sudo -S apt-get -y install php8.2 php8.2-cli php8.2-common php8.2-imap php8.2-redis php8.2-snmp php8.2-xml php8.2-mysqli php8.2-zip php8.2-mbstring php8.2-curl libapache2-mod-php"
+command_ssh "$web" "echo $SUDOPASS | sudo -S apt-get install apache2 -y"
+command_ssh "$web" "echo $SUDOPASS | sudo -S systemctl enable apache2"
+command_ssh "$web" "echo $SUDOPASS | sudo -S systemctl start apache2"
 command_ssh "$web" "echo $SUDOPASS | sudo -S chown -R $USER:www-data /var/www/html/"
 command_ssh "$web" "echo $SUDOPASS | sudo -S chmod -R 770 /var/www/html/"
+
+# Download and Install WordPress
+command_ssh "$web" "cd /var/www/html"
+command_ssh "$web" "wget https://wordpress.org/latest.zip"
+command_ssh "$web" "unzip latest.zip"
+command_ssh "$web" "rm latest.zip"
+command_ssh "$web" "chown -R www-data:www-data wordpress/"
+command_ssh "$web" "cd wordpress/"
+command_ssh "$web" "find . -type d -exec chmod 755 {} \;"
+command_ssh "$web" "find . -type f -exec chmod 644 {} \;"
+
+# Create Apache Virtual Host File
+command_ssh "$web" "cd /etc/apache2/sites-available/"
+command_ssh "$web" "touch wordpress.conf"
+command_ssh "$web" "echo '<VirtualHost *:80>' > wordpress.conf"
+command_ssh "$web" "echo 'ServerName yourdomain.com' >> wordpress.conf"
+command_ssh "$web" "echo 'DocumentRoot /var/www/html/wordpress' >> wordpress.conf"
+command_ssh "$web" "echo '<Directory /var/www/html/wordpress>' >> wordpress.conf"
+command_ssh "$web" "echo 'AllowOverride All' >> wordpress.conf"
+command_ssh "$web" "echo '</Directory>' >> wordpress.conf"
+command_ssh "$web" "echo 'ErrorLog ${APACHE_LOG_DIR}/error.log' >> wordpress.conf"
+command_ssh "$web" "echo 'CustomLog ${APACHE_LOG_DIR}/access.log combined' >> wordpress.conf"
+command_ssh "$web" "echo '</VirtualHost>' >> wordpress.conf"
+
+# Restart Apache
+command_ssh "$web" "echo $SUDOPASS | sudo -S systemctl restart apache2"
+
 
 # Exemple : créer un répertoire sur l'hôte distant
 command_ssh "$web" "echo $SUDOPASS | sudo -S mkdir /home/kidoly/test405"
@@ -56,25 +85,23 @@ command_ssh "$web" "echo 'Le script a terminé avec succès. Votre serveur est p
 #connexion à la vm bdd
 SUDOPASS="root"
 
-command_ssh "$web" "echo $SUDOPASS | touch /home/kidoly/itworks8"
-
 # Vérifie les mises à jour du système
-command_ssh "$web" "echo $SUDOPASS |sudo -S apt update && sudo apt -y upgrade"
+command_ssh "$bdd" "echo $SUDOPASS | sudo -S apt-get update && echo $SUDOPASS | sudo -S apt-get -y upgrade"
 
 # Installation d'OpenSSL
-command_ssh "$web" "echo $SUDOPASS |sudo -S apt install openssl -y"
+command_ssh "$bdd" "echo $SUDOPASS | sudo -S apt-get install openssl -y"
 
 # Installation de MariaDB
-command_ssh "$web" "echo $SUDOPASS |sudo -S apt install mariadb-server php-mysql -y"
+command_ssh "$bdd" "echo $SUDOPASS | sudo -S apt-get install mariadb-server mariadb-client php-mysql -y"
+command_ssh "$bdd" "echo $SUDOPASS | sudo -S start mariadb"
+command_ssh "$bdd" "echo $SUDOPASS | sudo -S systemctl enable mariadb"
 
-# On se connecte à MySQL
-command_ssh "$web" "echo $SUDOPASS | sudo -S mysql --user=root <<MYSQL_SCRIPT
-$PASSWORD=\$(openssl rand -base64 32)
-# On change le mot de passe de l'utilisateur root
-ALTER USER 'root'@'localhost' IDENTIFIED BY '\$PASSWORD';
-FLUSH PRIVILEGES;
-MYSQL_SCRIPT"
+# Création d'un mot de passe aléatoire pour l'utilisateur root de MySQL
+command_ssh "$bdd" "MYSQL_PASSWORD=\$(openssl rand -base64 32)"
 
-command_ssh "$web" "echo $SUDOPASS | echo "Le mot de passe root de MySQL a été modifié. Nouveau mot de passe : $PASSWORD"
+# On se connecte à MySQL et change le mot de passe de l'utilisateur root
+command_ssh "$web" "echo $SUDOPASS | mysql --user=root -e \"CREATE USER 'wordpress'@'localhost' IDENTIFIED BY '\$MYSQL_PASSWORD'; CREATE DATABASE wordpress; GRANT ALL PRIVILEGES ON wordpress.* TO 'wordpress'@'localhost'; FLUSH PRIVILEGES;\""
+
+command_ssh "$bdd" "echo $SUDOPASS | echo "Le mot de passe root de MySQL a été modifié. Nouveau mot de passe : $PASSWORD"
 exit
 
