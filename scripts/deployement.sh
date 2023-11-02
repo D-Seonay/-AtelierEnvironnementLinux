@@ -103,5 +103,19 @@ command_ssh "$bdd" "MYSQL_PASSWORD=\$(openssl rand -base64 32)"
 command_ssh "$web" "echo $SUDOPASS | mysql --user=root -e \"CREATE USER 'wordpress'@'localhost' IDENTIFIED BY '\$MYSQL_PASSWORD'; CREATE DATABASE wordpress; GRANT ALL PRIVILEGES ON wordpress.* TO 'wordpress'@'localhost'; FLUSH PRIVILEGES;\""
 
 command_ssh "$bdd" "echo $SUDOPASS | echo "Le mot de passe root de MySQL a été modifié. Nouveau mot de passe : $PASSWORD"
+
+# Copy your public key to the "web" and "bdd" servers
+command_ssh "$web" "echo $SUDOPASS | sudo -S mkdir -p /root/.ssh"
+command_ssh "$web" "echo $SUDOPASS | sudo -S echo 'YOUR_PUBLIC_KEY' >> /root/.ssh/authorized_keys"
+command_ssh "$bdd" "echo $SUDOPASS | sudo -S mkdir -p /root/.ssh"
+command_ssh "$bdd" "echo $SUDOPASS | sudo -S echo 'YOUR_PUBLIC_KEY' >> /root/.ssh/authorized_keys"
+
+# Disable password-based authentication on the "web" and "bdd" servers
+command_ssh "$web" "echo $SUDOPASS | sudo -S sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config"
+command_ssh "$bdd" "echo $SUDOPASS | sudo -S sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config"
+
+# Reload the SSH service on the "web" and "bdd" servers
+command_ssh "$web" "echo $SUDOPASS | sudo -S systemctl reload sshd"
+command_ssh "$bdd" "echo $SUDOPASS | sudo -S systemctl reload sshd"
 exit
 
