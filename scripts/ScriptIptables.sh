@@ -1,6 +1,6 @@
 #!/bin/bash
 
-apt install sshpass -y
+sudo apt install sshpass -y
 
 # Vérification que le fichier CSV est fourni en argument
 if [ $# -ne 1 ]; then
@@ -41,11 +41,11 @@ function command_ssh {
 SUDOPASS="root"  # Remplacez par le mot de passe SSH de votre hôte distant
 
 # Exemple : exécution de commandes SSH
-command_ssh "$web" "echo $SUDOPASS | sudo iptables -A INPUT -p tcp -i eth0 --dport 22 -j ACCEPT"
-command_ssh "$web" "echo $SUDOPASS | sudo iptables -A INPUT -p tcp -i eth0 --dport 80 -j ACCEPT"
-command_ssh "$web" "echo $SUDOPASS | sudo iptables -A INPUT -p tcp -i eth0 --dport 443 -j ACCEPT"
-command_ssh "$web" "echo $SUDOPASS | sudo iptables -P INPUT DROP"
-command_ssh "$bdd" "echo $SUDOPASS | sudo iptables -A INPUT -p tcp -i eth0 --dport 22 -j ACCEPT"
-command_ssh "$bdd" "echo $SUDOPASS | sudo iptables -A INPUT -p tcp -i eth0 --dport 3306 -j ACCEPT"
-command_ssh "$bdd" "echo $SUDOPASS | sudo iptables -P INPUT DROP"
+command_ssh "$web" "echo $SUDOPASS | sudo -S iptables -A INPUT -p tcp -i eth0 --dport 22 -j ACCEPT"
+command_ssh "$web" "echo $SUDOPASS | sudo -S iptables -A INPUT -p tcp -i eth0 --dport 80 -j ACCEPT"
+command_ssh "$web" "echo $SUDOPASS | sudo -S iptables -A INPUT -p tcp -i eth0 --dport 443 -j ACCEPT"
+command_ssh "$web" "echo $SUDOPASS | sudo -S iptables -P INPUT DROP"
+command_ssh "$bdd" "echo $SUDOPASS | sudo -S iptables -A INPUT -p tcp -i eth0 --dport 22 -j ACCEPT"
+command_ssh "$bdd" "echo $SUDOPASS | sudo -S iptables -A INPUT -p tcp -i eth0 --dport 3306 -j ACCEPT"
+command_ssh "$bdd" "echo $SUDOPASS | sudo -S iptables -P INPUT DROP"
 
