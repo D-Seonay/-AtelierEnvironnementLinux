@@ -32,7 +32,7 @@ echo "bdd = $bdd"
 
 function command_ssh {
   [ ${#} -gt 0 ] || return 1
-  echo $SUDOPASS | ssh -tt kidoly@$web ${@}
+  echo $SUDOPASS | sshpass -p $SUDOPASS -tt ssh kidoly@$web ${@}
 }
 
 #connexion à la vm web
@@ -40,7 +40,6 @@ SUDOPASS="root"
 echo $SUDOPASS
 echo $web
 
-sshpass -v -p $SUDOPASS ssh kidoly@$web
 
 # Vérifie les mises à jour du système
 command_ssh sudo apt update && sudo apt -y upgrade
