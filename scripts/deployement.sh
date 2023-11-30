@@ -100,9 +100,9 @@ command_ssh "$bdd" "echo $SUDOPASS | sudo -S systemctl enable mariadb"
 command_ssh "$bdd" "MYSQL_PASSWORD=\$(openssl rand -base64 32)"
 
 # On se connecte à MySQL et change le mot de passe de l'utilisateur root
-command_ssh "$web" "echo $SUDOPASS | mysql --user=root -e \"CREATE USER 'wordpress'@'localhost' IDENTIFIED BY '\$MYSQL_PASSWORD'; CREATE DATABASE wordpress; GRANT ALL PRIVILEGES ON wordpress.* TO 'wordpress'@'localhost'; FLUSH PRIVILEGES;\""
+command_ssh "$bdd" "echo $SUDOPASS | mysql --user=root -e \"CREATE USER 'wordpress'@'localhost' IDENTIFIED BY '\$MYSQL_PASSWORD'; CREATE DATABASE wordpress; GRANT ALL PRIVILEGES ON wordpress.* TO 'wordpress'@'localhost'; FLUSH PRIVILEGES;\""
 
-command_ssh "$bdd" "echo $SUDOPASS | echo "Le mot de passe root de MySQL a été modifié. Nouveau mot de passe : $PASSWORD"
+command_ssh "$bdd" "echo $SUDOPASS | echo \"Le mot de passe root de MySQL a été modifié. Nouveau mot de passe : \$PASSWORD\""
 
 # Copy your public key to the "web" and "bdd" servers
 command_ssh "$web" "echo $SUDOPASS | sudo -S mkdir -p /root/.ssh"
