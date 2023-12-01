@@ -2,6 +2,15 @@
 
 sudo apt install sshpass -y
 
+# Check if the flag file exists indicating the script has already been executed
+if [ -f "$HOME/.script_iptables_flag" ]; then
+    echo "The script has already been executed. Exiting."
+    exit 0
+fi
+
+# Create the flag file to indicate that the script is being executed
+touch "$HOME/.script_iptables_flag"
+
 # Vérification que le fichier CSV est fourni en argument
 if [ $# -ne 1 ]; then
     echo "Utilisation : $0 fichier.csv"
