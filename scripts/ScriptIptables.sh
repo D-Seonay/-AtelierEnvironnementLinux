@@ -42,10 +42,14 @@ echo "bdd = $bdd"
 
 # Fonction pour exécuter des commandes SSH avec sshpass
 function command_ssh {
-    [ ${#} -gt 0 ] || return 1
-    sshpass -p root ssh -o StrictHostKeyChecking=no kidoly@$1 $2
+    [ ${#} -gt 0 ] || { echo "Error: No arguments provided"; return 1; }
+    sshpass -p root ssh -o StrictHostKeyChecking=no kidoly@$1 "$2"
+    local status=$?
+    if [ $status -ne 0 ]; then
+        echo "Error: SSH command failed with status $status"
+    fi
+    return $status
 }
-
 # Connexion à la VM web
 SUDOPASS="root"  # Remplacez par le mot de passe SSH de votre hôte distant
 
