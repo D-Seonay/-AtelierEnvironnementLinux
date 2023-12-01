@@ -4,11 +4,22 @@
 role=$(hostname)
 destination_directory="./backup"
 
+
 # Check if the flag file exists indicating the script has already been executed
 if [ -f "$HOME/.script_backup_flag" ]; then
     echo "The script has already been executed. Exiting."
     exit 0
 fi
+
+function command_ssh {
+    [ ${#} -gt 0 ] || { echo "Error: No arguments provided"; return 1; }
+    sshpass -p root ssh -o StrictHostKeyChecking=no kidoly@$1 "$2"
+    local status=$?
+    if [ $status -ne 0 ]; then
+        echo "Error: SSH command failed with status $status"
+    fi
+    return $status
+}
 
 # Create the flag file to indicate that the script is being executed
 touch "$HOME/.script_backup_flag"
