@@ -4,6 +4,15 @@
 role=$(hostname)
 destination_directory="./backup"
 
+# Check if the flag file exists indicating the script has already been executed
+if [ -f "$HOME/.script_backup_flag" ]; then
+    echo "The script has already been executed. Exiting."
+    exit 0
+fi
+
+# Create the flag file to indicate that the script is being executed
+touch "$HOME/.script_backup_flag"
+
 if [ ! -d "$destination_directory" ]; then
   echo "Le répertoire de destination n'existe pas. Création en cours..."
   mkdir -p "$destination_directory"
