@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# Check if the flag file exists indicating the script has already been executed
+if [ -f "$HOME/.script_deployement_flag" ]; then
+    echo "The script has already been executed. Exiting."
+    exit 0
+fi
+
+# Create the flag file to indicate that the script is being executed
+touch "$HOME/.script_deployement_flag"
+
 apt install sshpass -y
 
 # Vérification que le fichier CSV est fourni en argument
