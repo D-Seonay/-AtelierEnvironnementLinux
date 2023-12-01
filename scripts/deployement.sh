@@ -42,8 +42,13 @@ echo "bdd = $bdd"
 
 # Function to execute SSH commands with sshpass
 function command_ssh {
-    [ ${#} -gt 0 ] || return 1
-    sshpass -p root ssh -o StrictHostKeyChecking=no kidoly@$1 $2
+    [ ${#} -gt 0 ] || { echo "Error: No arguments provided"; return 1; }
+    sshpass -p root ssh -o StrictHostKeyChecking=no kidoly@$1 "$2"
+    local status=$?
+    if [ $status -ne 0 ]; then
+        echo "Error: SSH command failed with status $status"
+    fi
+    return $status
 }
 
 # Password use on both remote host
