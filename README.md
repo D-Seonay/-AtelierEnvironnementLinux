@@ -24,53 +24,55 @@ Le PDF avec les consignes : [PDF](EPSISN2TPAtelierEnvironnementLinux.pdf)
 ## Rendu
 
 
-# Deployment Script
+# Script de déploiement
 
-This script is designed for automated deployment tasks via SSH, catering to various scenarios based on command-line arguments.
+Ce script est conçu pour les tâches de déploiement automatisées via SSH, répondant à divers scénarios basés sur des arguments de ligne de commande.
 
-## Usage
+## Utilisation
 
 ```bash
 ./deploy_script.sh fichier.csv {web|bdd|deploywp}
 ```
 
-fichier.csv: The CSV file containing configuration information for deployment.
-{web|bdd|deploywp}: Command-line argument specifying the deployment task.
+fichier.csv : Le fichier CSV contenant les informations de configuration pour le déploiement.
+{web|bdd|deploywp} : argument de ligne de commande spécifiant la tâche de déploiement.
 
 ## Instruction
 
-1. **Flag File:**
-   - The script utilizes a flag file (\$HOME/.script_deployement_flag) to ensure it is not executed multiple times. If the flag file exists, the script exits.
+1. **Fichier drapeau :**
+   - Le script utilise un fichier indicateur (\$HOME/.script_deployement_flag) pour garantir qu'il n'est pas exécuté plusieurs fois. Si le fichier flag existe, le script se termine.
 
-2. **CSV File:**
-   - Ensure that a valid CSV file is provided as an argument when executing the script. The CSV file should contain configuration information for the deployment.
+2. **Fichier CSV :**
+   - Assurez-vous qu'un fichier CSV valide est fourni comme argument lors de l'exécution du script. Le fichier CSV doit contenir des informations de configuration pour le déploiement.
 
-3. **Deployment Tasks:**
-   - The script supports three deployment tasks:
-     - web: Deploys a web server with PHP.
-     - bdd: Deploys a database server and configures it.
-     - deploywp: Installs WordPress on the web server, configures the database, and performs SSH configuration.
+3. **Tâches de déploiement :**
+   - Le script prend en charge trois tâches de déploiement :
+     - web : Déploie un serveur web avec PHP.
+     - bdd : Déploie un serveur de base de données et le configure.
+     - déployerwp : installe WordPress sur le serveur Web, configure la base de données et effectue la configuration SSH.
 
-4. **SSH Configuration:**
-   - The script configures SSH on the target servers by copying the public key to the remote hosts and disabling password-based authentication.
+4. **Configuration SSH :**
+   - Le script configure SSH sur les serveurs cibles en copiant la clé publique sur les hôtes distants et en désactivant l'authentification par mot de passe.
 
-5. **Security Considerations:**
-   - Before disabling password-based authentication, ensure that SSH key-based authentication is set up and tested successfully.
+5. **Considérations de sécurité :**
+   - Avant de désactiver l'authentification par mot de passe, assurez-vous que l'authentification par clé SSH est configurée et testée avec succès.
 
-## Examples
-**Web Server Deployement**
+## Exemples
+**Déploiement du serveur Web**
 ./deploy_script.sh fichier.csv web
 
-**Database Server Deployement**
+**Déploiement du serveur de base de données**
 ./deploy_script.sh fichier.csv bdd
 
-**WordPress Deployement
+**Déploiement WordPress
 ./deploy_script.sh fichier.csv bdd
 
-## Notes
-Replace 'YOUR_PUBLIC_KEY' with your actual public key in the script.
-Replace 'SUDOPASS' with the actual password in the script.
+## Remarques
+Remplacez 'YOUR_PUBLIC_KEY' par votre clé publique réelle dans le script.
+Remplacez 'SUDOPASS' par le mot de passe réel dans le script.
 
+## Screenshots
+![If the script has been already use](https://github.com/D-Seonay/AtelierEnvironnementLinux/blob/main/already.png)
 
 ## Auteur
 [@D-Seonay](https://github.com/D-Seonay) [@jojosashaw](https://github.com/jojosashaw) [@Kidoly](https://github.com/Kidoly)
